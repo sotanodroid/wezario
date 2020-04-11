@@ -1,3 +1,18 @@
+
+# Created by https://www.gitignore.io/api/go,code,dotenv
+# Edit at https://www.gitignore.io/?templates=go,code,dotenv
+
+### Code ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+### dotenv ###
+.env
+
+### Go ###
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -13,3 +28,9 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+### Go Patch ###
+/vendor/
+/Godeps/
+
+# End of https://www.gitignore.io/api/go,code,dotenv

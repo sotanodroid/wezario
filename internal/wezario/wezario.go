@@ -1,34 +1,35 @@
 package wezario
 
 import (
-	"fmt"
-
 	"github.com/urfave/cli/v2"
 )
 
-func Start() *cli.App {
-	var language string
+var HTTPClient *client
+
+// Start starts new app which parses command line arguments
+// to provide weather information
+func Start(cfg *Config) *cli.App {
+	var city string
+	HTTPClient = NewClient(cfg)
 
 	return &cli.App{
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "lang",
-				Value:       "english",
-				Usage:       "language for the greeting",
-				Destination: &language,
+				Name:        "city",
+				Value:       "Moscow",
+				Usage:       "city to show weather information for",
+				Destination: &city,
 			},
 		},
 		Action: func(c *cli.Context) error {
-			name := "someone"
-			if c.NArg() > 0 {
-				name = c.Args().Get(0)
-			}
-			if language == "spanish" {
-				fmt.Println("Hola", name)
-			} else {
-				fmt.Println("Hello", name)
-			}
-			return nil
+			return getWeather(c, city)
 		},
 	}
+}
+
+func getWeather(c *cli.Context, city string) error {
+
+	HTTPClient.requestWeather(city)
+
+	return nil
 }
