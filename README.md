@@ -1,27 +1,13 @@
+
 # wezario
-Simple command-line tool to get current weather 
 
-# TODO
+**Simple command-line tool to get current weather** 
 
-Реализовать получение данные по городам через флаги (пока просто получение имени города из флага) +
+[![asciicast](https://asciinema.org/a/7ZRUc8GnvQFU1QG4JxDMHAtbj.svg)](https://asciinema.org/a/7ZRUc8GnvQFU1QG4JxDMHAtbj)
 
-Выбрать апи для получения погоды +
+## Usage
 
-создать хендлер для запроса погоды и вывода его +
+If you run simple ./main you'll get the weather info for Moscow region
+But with `--city` flag you can specify which city you want to get
 
-конфигурация приложения (URL, токены) +
-
-добавить  makefile
-
-?трансформировать его в бота для телеги и залить на Digital Ocean
-
-??создать кэш хранилище дял получения данных из кеша с ТТЛ 1 час Redis
-
-???сделать гифку для ридми
-
-
-
-Инструкция:
-go run wezario/cmd/main.go --city London
-
-Без флага выбирает Москву
+  ![Image of Gopher with umbrella](https://phillipsoft.com/images/posts/alexa-golang/umbrella.svg)

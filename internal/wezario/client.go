@@ -14,17 +14,6 @@ type client struct {
 	cfg    *Config
 }
 
-type result struct {
-	Weather []struct {
-		Main        string `json:"main"`
-		Description string `json:"description"`
-	} `json:"weather"`
-	Main struct {
-		Temp      float64 `json:"temp"`
-		FeelsLike float64 `json:"feels_like"`
-	} `json:"main"`
-}
-
 func NewClient(cfg *Config) *client {
 	return &client{
 		cfg:    cfg,
@@ -37,7 +26,7 @@ func (c *client) requestWeather(cxt *cli.Context, city string) error {
 	q := c.cfg.OpenweathermapURL.Query()
 	q.Set("q", city)
 	q.Set("appid", c.cfg.OpenweathermapAPIKey)
-	q.Set("units", "metric") // TODO Добавить флаг выбора метрической системы
+	q.Set("units", "metric") // TODO add units flag
 	c.cfg.OpenweathermapURL.RawQuery = q.Encode()
 
 	resp, err := http.Get(c.cfg.OpenweathermapURL.String())
@@ -48,15 +37,17 @@ func (c *client) requestWeather(cxt *cli.Context, city string) error {
 	defer resp.Body.Close()
 
 	var res result
-	json.NewDecoder(resp.Body).Decode(&res)
-
-	weather, err := json.Marshal(res)
-	if err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return err
 	}
 
-	// FIXME Сделать человекочитаемый вывод в терминал, после публикации как бота -- убрать
-	fmt.Println(string(weather))
+	fmt.Printf(
+		"Temp\t\t%v\nFeels like\t%v\nThere is mostly %v (%v)\n",
+		res.Main.Temp,
+		res.Main.FeelsLike,
+		res.Weather[0].Main,
+		res.Weather[0].Description,
+	)
 
 	return nil
 }
