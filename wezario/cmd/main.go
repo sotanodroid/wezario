@@ -1,12 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
 
-	"github.com/sotanodroid/wezario/internal/app/wezario"
+	"github.com/sotanodroid/wezario/internal/wezario"
 )
 
 func main() {
-	app := wezario.New()
-	fmt.Printf("Hello")
+	app := wezario.Start()
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -3,10 +3,10 @@ package wezario
 import (
 	"fmt"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
-func New() *cli.App {
+func Start() *cli.App {
 	var language string
 
 	return &cli.App{
