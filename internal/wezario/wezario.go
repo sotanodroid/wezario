@@ -22,14 +22,7 @@ func Start(cfg *Config) *cli.App {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			return getWeather(c, city)
+			return HTTPClient.requestWeather(c, city)
 		},
 	}
-}
-
-func getWeather(c *cli.Context, city string) error {
-
-	HTTPClient.requestWeather(city)
-
-	return nil
 }
