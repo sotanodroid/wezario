@@ -9,8 +9,10 @@ import (
 	"github.com/sotanodroid/wezario/internal/wezario"
 )
 
+var logger *logrus.Logger
+
 func init() {
-	logger := logrus.New()
+	logger = logrus.New()
 
 	if err := godotenv.Load(); err != nil {
 		logger.Error(err)
@@ -18,8 +20,6 @@ func init() {
 }
 
 func main() {
-	logger := logrus.New()
-
 	cfg := wezario.NewConfig()
 	if err := envdecode.Decode(cfg); err != nil {
 		logger.Error(err)

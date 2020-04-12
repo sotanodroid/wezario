@@ -4,24 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
 )
 
 type client struct {
-	logger *logrus.Logger
-	cfg    *Config
+	cfg *Config
 }
 
-func NewClient(cfg *Config) *client {
+func NewHTTPClient(cfg *Config) *client {
 	return &client{
-		cfg:    cfg,
-		logger: logrus.New(),
+		cfg: cfg,
 	}
 }
 
-func (c *client) requestWeather(cxt *cli.Context, city string) error {
+func (c *client) requestWeather(city string) (string, error) {
 
 	q := c.cfg.OpenweathermapURL.Query()
 	q.Set("q", city)
@@ -31,23 +26,22 @@ func (c *client) requestWeather(cxt *cli.Context, city string) error {
 
 	resp, err := http.Get(c.cfg.OpenweathermapURL.String())
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	defer resp.Body.Close()
 
 	var res result
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Printf(
+	return fmt.Sprintf(
 		"Temp\t\t%v\nFeels like\t%v\nThere is mostly %v (%v)\n",
 		res.Main.Temp,
 		res.Main.FeelsLike,
 		res.Weather[0].Main,
 		res.Weather[0].Description,
-	)
+	), nil
 
-	return nil
 }
