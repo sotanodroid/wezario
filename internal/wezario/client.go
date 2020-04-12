@@ -16,12 +16,12 @@ func NewHTTPClient(cfg *Config) *client {
 	}
 }
 
-func (c *client) requestWeather(city string) (string, error) {
+func (c *client) requestWeather(city, units string) (string, error) {
 
 	q := c.cfg.OpenweathermapURL.Query()
 	q.Set("q", city)
 	q.Set("appid", c.cfg.OpenweathermapAPIKey)
-	q.Set("units", "metric") // TODO add units flag
+	q.Set("units", units)
 	c.cfg.OpenweathermapURL.RawQuery = q.Encode()
 
 	resp, err := http.Get(c.cfg.OpenweathermapURL.String())
@@ -43,5 +43,4 @@ func (c *client) requestWeather(city string) (string, error) {
 		res.Weather[0].Main,
 		res.Weather[0].Description,
 	), nil
-
 }

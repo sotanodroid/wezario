@@ -12,6 +12,7 @@ var redisClient *redis.Client
 // to provide weather information
 func Start(cfg *Config) *cli.App {
 	var city string
+	var units string
 
 	HTTPClient = NewHTTPClient(cfg)
 	redisClient = NewRedisClient(cfg)
@@ -21,12 +22,20 @@ func Start(cfg *Config) *cli.App {
 			&cli.StringFlag{
 				Name:        "city",
 				Value:       "Moscow",
+				Aliases:     []string{"c"},
 				Usage:       "city to show weather information for",
 				Destination: &city,
 			},
+			&cli.StringFlag{
+				Name:        "units",
+				Value:       "metric",
+				Aliases:     []string{"u"},
+				Usage:       "Unit metric system to show. Choses 'imperial' or 'metric'.",
+				Destination: &units,
+			},
 		},
 		Action: func(c *cli.Context) error {
-			return getOrSetWeatherData(c, city)
+			return getOrSetWeatherData(c, city, units)
 		},
 	}
 }
