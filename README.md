@@ -8,7 +8,7 @@
 
 create your own `.env` file from `.env.example` with `SERVICE_KEY` value set to your openweathermap API key
 
-run included docker-compose with redis `docker-compose ru -d`
+run included docker-compose with redis `docker-compose up -d`
 
 
 ```
