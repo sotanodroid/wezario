@@ -22,6 +22,13 @@ func main() {
 	if err := envdecode.Decode(cfg); err != nil {
 		logger.Error(err)
 	}
+
+	level, err := logrus.ParseLevel(cfg.Loglevel)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	logger.SetLevel(level)
 	logger.Info("Application starts")
 
 	if err := wezario.Start(cfg); err != nil {
