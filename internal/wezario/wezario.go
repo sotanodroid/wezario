@@ -1,41 +1,69 @@
 package wezario
 
 import (
+	"fmt"
+
+	tgbotapi "github.com/Syfaro/telegram-bot-api"
 	"github.com/go-redis/redis/v7"
-	"github.com/urfave/cli/v2"
 )
 
-var HTTPClient *client
+var httpClient *client
 var redisClient *redis.Client
 
 // Start starts new app which parses command line arguments
 // to provide weather information
-func Start(cfg *Config) *cli.App {
-	var city string
-	var units string
+func Start(cfg *Config) error {
+	httpClient = newHTTPClient(cfg)
+	redisClient = newRedisClient(cfg)
 
-	HTTPClient = NewHTTPClient(cfg)
-	redisClient = NewRedisClient(cfg)
-
-	return &cli.App{
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "city",
-				Value:       "Moscow",
-				Aliases:     []string{"c"},
-				Usage:       "city to show weather information for",
-				Destination: &city,
-			},
-			&cli.StringFlag{
-				Name:        "units",
-				Value:       "metric",
-				Aliases:     []string{"u"},
-				Usage:       "Unit metric system to show. Choses 'imperial' or 'metric'.",
-				Destination: &units,
-			},
-		},
-		Action: func(c *cli.Context) error {
-			return getOrSetWeatherData(c, city, units)
-		},
+	bot, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
+	if err != nil {
+		return err
 	}
+
+	bot.Debug = true
+
+	var ucfg tgbotapi.UpdateConfig = tgbotapi.NewUpdate(0)
+	ucfg.Timeout = 60
+
+	updatesChan, err := bot.GetUpdatesChan(ucfg)
+	if err != nil {
+		return err
+	}
+
+	for update := range updatesChan {
+		if update.Message == nil {
+			continue
+		}
+		if update.Message.Text == "/start" {
+			result := fmt.Sprintf(
+				"%s\n\n%s\n%s\n",
+				"Привет!",
+				"Я могу узнать для тебя погоду в любом городе.",
+				"Напиши мне название города на английском языке и я выдам результат.",
+			)
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, result)
+			bot.Send(msg)
+			continue
+		}
+
+		city := update.Message.Text
+		weatherInfo, err := getOrSetWeatherData(city)
+		if err != nil || weatherInfo == " " {
+			result := fmt.Sprintf(
+				"Не удается получить информацию по городу %s",
+				city,
+			)
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, result)
+			bot.Send(msg)
+			continue
+		}
+
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, weatherInfo)
+		msg.ReplyToMessageID = update.Message.MessageID
+
+		bot.Send(msg)
+	}
+
+	return nil
 }

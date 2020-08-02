@@ -2,26 +2,29 @@ package wezario
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 )
+
+const notFound = 404
 
 type client struct {
 	cfg *Config
 }
 
-func NewHTTPClient(cfg *Config) *client {
+func newHTTPClient(cfg *Config) *client {
 	return &client{
 		cfg: cfg,
 	}
 }
 
-func (c *client) requestWeather(city, units string) (string, error) {
+func (c *client) requestWeather(city string) (string, error) {
 
 	q := c.cfg.OpenweathermapURL.Query()
 	q.Set("q", city)
 	q.Set("appid", c.cfg.OpenweathermapAPIKey)
-	q.Set("units", units)
+	q.Set("units", "metric")
 	c.cfg.OpenweathermapURL.RawQuery = q.Encode()
 
 	resp, err := http.Get(c.cfg.OpenweathermapURL.String())
@@ -30,6 +33,10 @@ func (c *client) requestWeather(city, units string) (string, error) {
 	}
 
 	defer resp.Body.Close()
+
+	if resp.StatusCode == notFound {
+		return "", errors.New("Такого города нет")
+	}
 
 	var res result
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
