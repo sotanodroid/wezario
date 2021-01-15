@@ -9,17 +9,17 @@ import (
 
 const notFound = 404
 
-type client struct {
+type httpClient struct {
 	cfg *Config
 }
 
-func newHTTPClient(cfg *Config) *client {
-	return &client{
+func newHTTPClient(cfg *Config) *httpClient {
+	return &httpClient{
 		cfg: cfg,
 	}
 }
 
-func (c *client) requestWeather(city string) (string, error) {
+func (c *httpClient) requestWeather(city string) (string, error) {
 
 	q := c.cfg.OpenweathermapURL.Query()
 	q.Set("q", city)
@@ -35,7 +35,7 @@ func (c *client) requestWeather(city string) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == notFound {
-		return "", errors.New("Такого города нет")
+		return "", errors.New("City not found")
 	}
 
 	var res result

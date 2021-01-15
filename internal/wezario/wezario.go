@@ -1,27 +1,19 @@
 package wezario
 
 import (
-	tgbotapi "github.com/Syfaro/telegram-bot-api"
-	"github.com/go-redis/redis/v7"
+	"github.com/sirupsen/logrus"
 )
-
-var httpClient *client
-var redisClient *redis.Client
-var teleBot *tgbotapi.BotAPI
 
 // Start starts new app which parses command line arguments
 // to provide weather information
-func Start(cfg *Config) error {
-	var err error
-
-	httpClient = newHTTPClient(cfg)
-	redisClient = newRedisClient(cfg)
-	teleBot, err = newTeleBot(cfg)
+func Start(cfg *Config, logger *logrus.Logger) error {
+	openWeatherClient := newOpenWeatherClient(cfg)
+	teleBot, err := newTeleBot(cfg, logger, openWeatherClient)
 	if err != nil {
 		return err
 	}
 
-	if err := processMessage(); err != nil {
+	if err := teleBot.processMessage(); err != nil {
 		return err
 	}
 

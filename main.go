@@ -2,22 +2,13 @@ package main
 
 import (
 	"github.com/joeshaw/envdecode"
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/sirupsen/logrus"
 	"github.com/sotanodroid/wezario/internal/wezario"
 )
 
-var logger *logrus.Logger
-
-func init() {
-	logger = logrus.New()
-
-	if err := godotenv.Load(); err != nil {
-		logger.Error(err)
-	}
-}
-
 func main() {
+	logger := logrus.New()
 	cfg := wezario.NewConfig()
 	if err := envdecode.Decode(cfg); err != nil {
 		logger.Error(err)
@@ -31,7 +22,7 @@ func main() {
 	logger.SetLevel(level)
 	logger.Info("Application starts")
 
-	if err := wezario.Start(cfg); err != nil {
+	if err := wezario.Start(cfg, logger); err != nil {
 		logger.Fatal(err)
 	}
 }
